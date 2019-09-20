@@ -14,7 +14,7 @@ int main()
 {
 //----------DEFINICION VARIABLES--------------
 int N = 256, pasos = 10000, size_tabla = 500000, i;
-double *x, *p, r_cut2 = 36, s_cut2 = 10, rho = 0.18, L = cbrt(N / rho), Temp = 4.0, beta = 1 / Temp;
+double *x, *p, r_cut2 = 36, s_cut2 = 10, rho = 0.18, L = cbrt(N / rho), Temp = 4.0, beta = 1.0 / Temp;
 x = (double*) malloc (3 * N * sizeof(double));
 p = (double*) malloc (3 * N * sizeof(double));
 double *rij2, *pij2;
