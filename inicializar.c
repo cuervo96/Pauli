@@ -1,7 +1,7 @@
 double set_box(double *X, int N, double L)
 { // Ordena las partículas en una red cúbica. Coición inicial.ial
 int n=cbrt(N),i=0;
-double dl=L/n;
+double dl=L/(double)n;
 for(int x = 0; x < n; x++)
         {
         for(int y = 0; y < n; y++)
@@ -15,6 +15,7 @@ for(int x = 0; x < n; x++)
                         }
                 }
         }
+printf("%lf \n", dl);
 return dl;
 }
 double set_box_random(double *x, int N, double L)

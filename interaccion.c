@@ -52,14 +52,18 @@ for(i = 0; i < N - 1; i++)
 		{r2 = 0, p2 = 0;
 		delta_ij(x, rij2, i, j);
 		delta_ij(p, pij2, i, j);
-		PBC_delta(rij2, L);
+		//PBC_delta(rij2, L);
 		for(k = 0; k < 3; k++)
 			{
-			r2 += *(rij2 + k) * *(rij2 + k);
-			p2 += *(pij2 + k) * *(pij2 + k);
+			r2 += *(rij2 + k) * (*(rij2 + k));
+			p2 += *(pij2 + k) * (*(pij2 + k));
+						
 			}
 //printf("r2 = %lf \n",r2);	
-
+			if(r2 == 0)
+				{
+		//		printf("%lf %lf %lf %lf %lf %lf \n", *(x + 3*i), *(x + 3*i + 1), *(x + 3*i + 2),*(x + 3*j), *(x + 3*j + 1), *(x + 3*j + 2)  );
+				}
 		sij2 = r2 / (q0 * q0) + p2 / (p0 * p0);
 	       	if(r2 < r_cut2)
 			{
@@ -68,7 +72,7 @@ for(i = 0; i < N - 1; i++)
 		       		{k_r = 0;}
 			//printf("%d \n", k_r );			
 			VN += ((r2 - k_r * *deltar2)/ *deltar2) * (*(Tabla_VN + k_r +1)-*(Tabla_VN + k_r)) + *(Tabla_VN + k_r);		
-			
+			//printf("%lf %lf %d \n", ((r2 - k_r * *deltar2)/ *deltar2) * (*(Tabla_VN + k_r +1)-*(Tabla_VN + k_r)) + *(Tabla_VN + k_r), r2, k_r);
 			}
 		if(sij2 < s_cut2)
 			{

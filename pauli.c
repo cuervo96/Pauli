@@ -13,8 +13,8 @@
 int main()
 {
 //----------DEFINICION VARIABLES--------------
-int N = 256, pasos = 10000, size_tabla = 500000, i;
-double *x, *p, r_cut2 = 36, s_cut2 = 10, rho = 0.18, L = cbrt(N / rho), Temp = 4.0, beta = 1.0 / Temp;
+int N = 4096, pasos = 0, size_tabla = 500000, i;
+double *x, *p, r_cut2 = 5.4 * 5.4, s_cut2 = 10, rho = 0.16, L = cbrt((double)N / rho), Temp = 4.0, beta = 1.0 / Temp;
 x = (double*) malloc (3 * N * sizeof(double));
 p = (double*) malloc (3 * N * sizeof(double));
 double *rij2, *pij2;
@@ -39,7 +39,8 @@ set_box(x, N, L);
 double Ecin = set_v(p, N, Temp);
 Energia = Calcular_E(Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L);
 *E = Energia;
-printf("%lf \n", Energia );
+printf("%lf \n", Energia/ (double)N );
+printf("%lf \n",L);
 //---------------------------------------------
 //------------------METROPOLIS-----------------
 
