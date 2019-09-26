@@ -13,20 +13,20 @@ for(i = 0; i < 3 *N; i++ )
 double delta_r = 0.2, dE;
 for (i = 0; i < 3; i++)
 	{
-	*(x_new + target + i) = *(x_new + target + i) + (Random() - 0.5) * 2 * delta_r;
+	*(x_new + 3*target + i) = *(x_new + 3*target + i) + (Random() - 0.5) * 2 * delta_r;
 	}
 applyPBC(x_new, L, N);
 dE = delta_E_r(Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L, target, x_new);
 //double E_new = Calcular_E(Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x_new, p, N, rij2, pij2, L);
 //double E_old = Calcular_E(Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L);
 //dE = E_new - E_old;
-printf("%lf\n",dE);
+//	printf("%lf\n",dE);
 if(dE < 0)
 	{
 	Energia += dE;
 	for(i = 0; i < 3; i++)
 		{
-		*(x + target + i) = *(x_new + target + i);
+		*(x + 3 * target + i) = *(x_new + 3 * target + i);
 		}
 	*aceptacion_r += 1;
 	}
@@ -35,7 +35,7 @@ else if(Random() < exp(-1 * beta * dE))
 		Energia += dE;
 		for(i = 0; i < 3; i++)
 			{
-			*(x + target + i) = *(x_new + target + i);
+			*(x + 3 * target + i) = *(x_new + 3 * target + i);
 			}
 		*aceptacion_r += 1;
 		}
@@ -53,19 +53,18 @@ for(i = 0; i < 3 *N; i++ )
 double delta_p = 1, dE;
 for (i = 0; i < 3; i++)
 	{
-	*(p_new + target + i) = *(p_new + target + i) + (Random() - 0.5) * 2 * delta_p;
+	*(p_new + 3 * target + i) = *(p_new + 3 * target + i) + (Random() - 0.5) * 2 * delta_p;
 	}
 dE = delta_E_p(Tabla_VP, s_cut2, deltas2, x, p, N, rij2, pij2, L, target, p_new);
-double E_new = Calcular_E(Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p_new, N, rij2, pij2, L);
-double E_old = Calcular_E(Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L);
-dE = E_new - E_old;
-
+//double E_new = Calcular_E(Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p_new, N, rij2, pij2, L);
+//double E_old = Calcular_E(Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L);
+//dE = E_new - E_old;
 if(dE < 0)
 	{
 	Energia += dE;
 	for(i = 0; i < 3; i++)
 		{
-		*(p + target + i) = *(p_new + target + i);
+		*(p + 3 * target + i) = *(p_new + 3 * target + i);
 		}
 	*aceptacion_p += 1;
 	}
@@ -74,7 +73,7 @@ else if(Random() < exp(-beta * dE))
 		Energia += dE;
 		for(i = 0; i < 3; i++)
 			{
-			*(p + target + i) = *(p_new + target + i);
+			*(p + 3 * target + i) = *(p_new + 3 * target + i);
 			}
 		*aceptacion_p += 1;
 		}

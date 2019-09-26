@@ -13,8 +13,8 @@
 int main()
 {
 //----------DEFINICION VARIABLES--------------
-int n = 8, N = n * n * n, pasos = 100000, size_tabla = 500000, i;
-double *x, *p, r_cut2 = 5.4 * 5.4, s_cut2 = 10, rho = 0.1, L = cbrt((double)N / rho), Temp = 4.0, beta = 1.0 / Temp;
+int n = 8, N = n * n * n, pasos = 10000000, size_tabla = 500000, i;
+double *x, *p, r_cut2 = 5.4 * 5.4, s_cut2 = 10, rho = 0.1, L = cbrt((double)N / rho), Temp = 2.0, beta = 1.0 / Temp;
 x = (double*) malloc (3 * N * sizeof(double));
 p = (double*) malloc (3 * N * sizeof(double));
 double *rij2, *pij2;
@@ -47,7 +47,7 @@ printf("%lf \n",L);
 for(i = 1; i < pasos; i++)
 	{
 	Energia = metropolis_r(Energia, Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L, beta, aceptacion_r);
-	//Energia = metropolis_p(Energia, Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L, beta, aceptacion_p);
+	Energia = metropolis_p(Energia, Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L, beta, aceptacion_p);
 	if(i % 100)
 		{
 			*(E + i/100) = Energia;
