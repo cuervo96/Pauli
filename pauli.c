@@ -13,8 +13,8 @@
 int main()
 {
 //----------DEFINICION VARIABLES--------------
-int N = 4096, pasos = 0, size_tabla = 500000, i;
-double *x, *p, r_cut2 = 5.4 * 5.4, s_cut2 = 10, rho = 0.16, L = cbrt((double)N / rho), Temp = 4.0, beta = 1.0 / Temp;
+int n = 8, N = n * n * n, pasos = 100000, size_tabla = 500000, i;
+double *x, *p, r_cut2 = 5.4 * 5.4, s_cut2 = 10, rho = 0.1, L = cbrt((double)N / rho), Temp = 4.0, beta = 1.0 / Temp;
 x = (double*) malloc (3 * N * sizeof(double));
 p = (double*) malloc (3 * N * sizeof(double));
 double *rij2, *pij2;
@@ -28,7 +28,7 @@ deltas2 = (double*) malloc(size_tabla * sizeof(double));
 int *aceptacion_r = 0, *aceptacion_p = 0;
 aceptacion_r = (int*) malloc(sizeof(int));
 aceptacion_p = (int*) malloc(sizeof(int));
-double *E = (double*) malloc(pasos / 100* sizeof(double));
+double *E = (double*) malloc(pasos / 100 * sizeof(double));
 char filename[255];
 sprintf(filename, "test_metropolis.txt");
 FILE *fp=fopen(filename, "w");
@@ -36,7 +36,7 @@ FILE *fp=fopen(filename, "w");
 //--------CONDICIONES INICIALES----------------
 Construir_Tablas(Tabla_VP, Tabla_VN, size_tabla, r_cut2, s_cut2, deltar2, deltas2);
 set_box(x, N, L);
-double Ecin = set_v(p, N, Temp);
+set_v(p, N, Temp);
 Energia = Calcular_E(Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L);
 *E = Energia;
 printf("%lf \n", Energia/ (double)N );
@@ -47,17 +47,20 @@ printf("%lf \n",L);
 for(i = 1; i < pasos; i++)
 	{
 	Energia = metropolis_r(Energia, Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L, beta, aceptacion_r);
-	Energia = metropolis_p(Energia, Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L, beta, aceptacion_p);
-	if( i % 100)
-	*(E + i/100) = Energia;
+	//Energia = metropolis_p(Energia, Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L, beta, aceptacion_p);
+	if(i % 100)
+		{
+			*(E + i/100) = Energia;
+		}
 	printf("Progreso: %.2lf %% \r", (double)i / (double)pasos * 100);
 	}
 printf("aceptacion_r = %lf \n", (double)*aceptacion_r / (double)pasos);
 printf("aceptacion_p = %lf \n", (double)*aceptacion_p / (double)pasos);
 for(i = 0; i < pasos/100; i++)
-	{	
-	fprintf(fp, "%lf \n", *(E + i));
+	{
+	fprintf(fp, "%lf \n", *(E + i)/ (double) N);
 	}
+//----------------------------------------------
 fclose(fp);
 free(x);
 free(p);
