@@ -2,7 +2,7 @@ int Target(N)
 {
 return (int) (Random() * (double)(N - 1));
 }
-double metropolis_r(double Energia, double *Tabla_VP, double *Tabla_VN, double r_cut2, double s_cut2, double *deltar2, double *deltas2, double *x, double *p, int N, double *rij2, double *pij2, double L, double beta, int *aceptacion_r)
+double metropolis_r(double Energia, double *Tabla_VP, double *Tabla_VN, double r_cut2, double s_cut2, double *deltar2, double *deltas2, double *x, double *p, int N, double *rij2, double *pij2, double L, double beta, int *aceptacion_r, int *spin, int *particle)
 {
 int i, target = Target(N);
 double *x_new = (double*) malloc(3 * N * sizeof(double));
@@ -16,7 +16,7 @@ for (i = 0; i < 3; i++)
 	*(x_new + 3*target + i) = *(x_new + 3*target + i) + (Random() - 0.5) * 2 * delta_r;
 	}
 applyPBC(x_new, L, N);
-dE = delta_E_r(Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L, target, x_new);
+dE = delta_E_r(Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L, target, x_new, spin, particle);
 //double E_new = Calcular_E(Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x_new, p, N, rij2, pij2, L);
 //double E_old = Calcular_E(Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L);
 //dE = E_new - E_old;
@@ -42,7 +42,7 @@ else if(Random() < exp(-1 * beta * dE))
 free(x_new);
 return Energia;
 }
-double metropolis_p(double Energia, double *Tabla_VP, double *Tabla_VN, double r_cut2, double s_cut2, double *deltar2, double *deltas2, double *x, double *p, int N, double *rij2, double *pij2, double L, double beta, int *aceptacion_p)
+double metropolis_p(double Energia, double *Tabla_VP, double *Tabla_VN, double r_cut2, double s_cut2, double *deltar2, double *deltas2, double *x, double *p, int N, double *rij2, double *pij2, double L, double beta, int *aceptacion_p, int *spin, int *particle)
 {
 int i, target = Target(N);
 double *p_new = (double*) malloc(3 * N * sizeof(double));
@@ -50,12 +50,12 @@ for(i = 0; i < 3 *N; i++ )
 	{
 	*(p_new + i) = *(p + i);
 	}
-double delta_p = 1, dE;
+double delta_p = 1.2, dE;
 for (i = 0; i < 3; i++)
 	{
 	*(p_new + 3 * target + i) = *(p_new + 3 * target + i) + (Random() - 0.5) * 2 * delta_p;
 	}
-dE = delta_E_p(Tabla_VP, s_cut2, deltas2, x, p, N, rij2, pij2, L, target, p_new);
+dE = delta_E_p(Tabla_VP, s_cut2, deltas2, x, p, N, rij2, pij2, L, target, p_new, spin, particle);
 //double E_new = Calcular_E(Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p_new, N, rij2, pij2, L);
 //double E_old = Calcular_E(Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L);
 //dE = E_new - E_old;

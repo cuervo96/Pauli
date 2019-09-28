@@ -24,7 +24,7 @@ int i;
 for(i = 0; i < 3 * N; i++)
 	{
 	*(x + i) = Random() * L;
-	}	
+	}
 return 0;
 }
 double set_v(double *v, int N, double T)
@@ -61,3 +61,23 @@ for(int i = 0; i < 3*N; i++)
 Ecin = (double)Ecin/(double)2;
 return Ecin;
 }
+int set_spin(int *spin, int N)
+{
+  int i;
+  for(i = 0; i < N / 2; i++)
+    {
+      *(spin + 2 * i) = 1;
+      *(spin + 2 * i + 1) = -1;
+    }
+  return 0;
+}
+int set_particle(int *particle, int N)
+  {
+  int i;
+    for(i = 0; i < N / 2; i++)
+      {
+        *(particle + 2 * i) = 1;
+        *(particle + 2 * i + 1) = -1;
+      }
+    return 0;
+  }

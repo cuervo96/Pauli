@@ -13,10 +13,13 @@
 int main()
 {
 //----------DEFINICION VARIABLES--------------
-int n = 8, N = n * n * n, pasos = 10000000, size_tabla = 500000, i;
-double *x, *p, r_cut2 = 5.4 * 5.4, s_cut2 = 10, rho = 0.1, L = cbrt((double)N / rho), Temp = 2.0, beta = 1.0 / Temp;
+int n = 2*4, N = n * n * n, pasos = 10000000, size_tabla = 500000, i;
+double *x, *p, r_cut2 = 5.4 * 5.4, s_cut2 = 10, rho = 0.1, L = cbrt((double)N / rho), Temp = 4.0, beta = 1.0 / Temp;
 x = (double*) malloc (3 * N * sizeof(double));
 p = (double*) malloc (3 * N * sizeof(double));
+int *spin, *particle; // ¡¡¡¡spin up = 1, spin down = -1 ---- proton = 1, neutron = -1!!!!
+spin = (int*) malloc (N * sizeof(int));
+particle = (int*) malloc (N * sizeof(int));
 double *rij2, *pij2;
 rij2 = (double*) malloc (3 * sizeof(double));
 pij2 = (double*) malloc (3 * sizeof(double));
@@ -37,7 +40,9 @@ FILE *fp=fopen(filename, "w");
 Construir_Tablas(Tabla_VP, Tabla_VN, size_tabla, r_cut2, s_cut2, deltar2, deltas2);
 set_box(x, N, L);
 set_v(p, N, Temp);
-Energia = Calcular_E(Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L);
+set_spin(spin, N);
+set_particle(particle, N);
+Energia = Calcular_E(Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L, spin, particle);
 *E = Energia;
 printf("%lf \n", Energia/ (double)N );
 printf("%lf \n",L);
@@ -46,8 +51,8 @@ printf("%lf \n",L);
 
 for(i = 1; i < pasos; i++)
 	{
-	Energia = metropolis_r(Energia, Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L, beta, aceptacion_r);
-	Energia = metropolis_p(Energia, Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L, beta, aceptacion_p);
+	Energia = metropolis_r(Energia, Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L, beta, aceptacion_r, spin, particle);
+	Energia = metropolis_p(Energia, Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L, beta, aceptacion_p, spin, particle);
 	if(i % 100)
 		{
 			*(E + i/100) = Energia;

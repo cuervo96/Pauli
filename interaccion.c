@@ -42,7 +42,7 @@ for(i = 0; i < 3; i++)
         }
 return 0;
 }
-double Calcular_E(double *Tabla_VP, double *Tabla_VN, double r_cut2, double s_cut2, double *deltar2, double *deltas2, double *x, double *p, int N, double *rij2, double *pij2, double L)
+double Calcular_E(double *Tabla_VP, double *Tabla_VN, double r_cut2, double s_cut2, double *deltar2, double *deltas2, double *x, double *p, int N, double *rij2, double *pij2, double L, int *spin, int *particle)
 {
 int i, j, k_r, k_s, k;
 double sij2, VN = 0, VP = 0, T = 0, r2 = 0, p2 = 0, q0 = 6, p0 = 2.067 * 0.0000000000000000000001;
@@ -57,7 +57,6 @@ for(i = 0; i < N - 1; i++)
 			{
 			r2 += *(rij2 + k) * (*(rij2 + k));
 			p2 += *(pij2 + k) * (*(pij2 + k));
-
 			}
 		sij2 = r2 / (q0 * q0) + p2 / (p0 * p0);
 	       	if(r2 < r_cut2)
@@ -69,15 +68,22 @@ for(i = 0; i < N - 1; i++)
 			VN += ((r2 - k_r * *deltar2)/ *deltar2) * (*(Tabla_VN + k_r +1)-*(Tabla_VN + k_r)) + *(Tabla_VN + k_r);
 			//printf("%lf %lf %d \n", ((r2 - k_r * *deltar2)/ *deltar2) * (*(Tabla_VN + k_r +1)-*(Tabla_VN + k_r)) + *(Tabla_VN + k_r), r2, k_r);
 			}
-		if(sij2 < s_cut2)
+			if(*(particle + i) == *(particle + j))
 			{
-			k_s = (int) ((sij2 - *deltas2) / *deltas2);
-			if(k_s < 0)
-				{k_s = 0;}
-			VP += ((sij2 - k_s * *deltas2)/ *deltas2) * (*(Tabla_VP + k_s +1)-*(Tabla_VP + k_s)) + *(Tabla_VP + k_s);
+				if(*(spin + i) == *(spin + j))
+					{
+						if(sij2 < s_cut2)
+							{
+								k_s = (int) ((sij2 - *deltas2) / *deltas2);
+								if(k_s < 0)
+								{k_s = 0;}
+								VP += ((sij2 - k_s * *deltas2)/ *deltas2) * (*(Tabla_VP + k_s +1)-*(Tabla_VP + k_s)) + *(Tabla_VP + k_s);
+							}
+						}
+					}
+				}
 			}
-		}
-	}
+
 for(i = 0; i < 3 *N; i++ )
 	{
 	T += *(p + i) * *(p + i) * 0.5;
@@ -85,13 +91,13 @@ for(i = 0; i < 3 *N; i++ )
 double E = (T + VN + VP);
 return E;
 }
-double delta_E_r(double *Tabla_VP, double *Tabla_VN, double r_cut2, double s_cut2, double *deltar2, double *deltas2, double *x, double *p, int N, double *rij2, double *pij2, double L, int target, double *x_new)
+double delta_E_r(double *Tabla_VP, double *Tabla_VN, double r_cut2, double s_cut2, double *deltar2, double *deltas2, double *x, double *p, int N, double *rij2, double *pij2, double L, int target, double *x_new, int *spin, int *particle)
 {
 	int i = target, j, k_r = 0, k_s = 0, k;
 	double sij2, VN_new = 0, VN_old = 0, VP_old = 0, VP_new = 0, r2 = 0, p2 = 0, q0 = 6, p0 = 2.067 * 0.0000000000000000000001, dE;
 		for(j = 0; j < target; j++)
-		{
-			{r2 = 0, p2 = 0;
+			{
+			r2 = 0, p2 = 0;
 			delta_ij(x_new, rij2, i, j);
 			delta_ij(p, pij2, i, j);
 			PBC_delta(rij2, L);
@@ -99,7 +105,6 @@ double delta_E_r(double *Tabla_VP, double *Tabla_VN, double r_cut2, double s_cut
 				{
 				r2 += *(rij2 + k) * (*(rij2 + k));
 				p2 += *(pij2 + k) * (*(pij2 + k));
-
 				}
 			sij2 = r2 / (q0 * q0) + p2 / (p0 * p0);
 		       	if(r2 < r_cut2)
@@ -107,22 +112,26 @@ double delta_E_r(double *Tabla_VP, double *Tabla_VN, double r_cut2, double s_cut
 				k_r = (int) ((r2 - *deltar2) / *deltar2);
 				if(k_r < 0)
 			       		{k_r = 0;}
-
 				VN_new += ((r2 - k_r * *deltar2)/ *deltar2) * (*(Tabla_VN + k_r +1)-*(Tabla_VN + k_r)) + *(Tabla_VN + k_r);
 				//printf("%lf %lf %d \n", ((r2 - k_r * *deltar2)/ *deltar2) * (*(Tabla_VN + k_r +1)-*(Tabla_VN + k_r)) + *(Tabla_VN + k_r), r2, k_r);
 				}
-			if(sij2 < s_cut2)
-				{
-				k_s = (int) ((sij2 - *deltas2) / *deltas2);
-				if(k_s < 0)
-					{k_s = 0;}
-				VP_new += ((sij2 - k_s * *deltas2)/ *deltas2) * (*(Tabla_VP + k_s +1)-*(Tabla_VP + k_s)) + *(Tabla_VP + k_s);
+				if(*(particle + i) == *(particle + j))
+					{
+						if(*(spin + i) == *(spin + j))
+							{
+								if(sij2 < s_cut2)
+								{
+									k_s = (int) ((sij2 - *deltas2) / *deltas2);
+									if(k_s < 0)
+									{k_s = 0;}
+									VP_new += ((sij2 - k_s * *deltas2)/ *deltas2) * (*(Tabla_VP + k_s +1)-*(Tabla_VP + k_s)) + *(Tabla_VP + k_s);
+								}
+							}
+					}
 				}
-			}
-		}
 		for(j = target + 1; j < N; j++)
 		{
-			{r2 = 0, p2 = 0;
+			r2 = 0, p2 = 0;
 			delta_ij(x_new, rij2, i, j);
 			delta_ij(p, pij2, i, j);
 			PBC_delta(rij2, L);
@@ -130,7 +139,6 @@ double delta_E_r(double *Tabla_VP, double *Tabla_VN, double r_cut2, double s_cut
 				{
 				r2 += *(rij2 + k) * (*(rij2 + k));
 				p2 += *(pij2 + k) * (*(pij2 + k));
-
 				}
 			sij2 = r2 / (q0 * q0) + p2 / (p0 * p0);
 		       	if(r2 < r_cut2)
@@ -138,22 +146,26 @@ double delta_E_r(double *Tabla_VP, double *Tabla_VN, double r_cut2, double s_cut
 				k_r = (int) ((r2 - *deltar2) / *deltar2);
 				if(k_r < 0)
 			       		{k_r = 0;}
-
 				VN_new += ((r2 - k_r * *deltar2)/ *deltar2) * (*(Tabla_VN + k_r +1)-*(Tabla_VN + k_r)) + *(Tabla_VN + k_r);
 				//printf("%lf %lf %d \n", ((r2 - k_r * *deltar2)/ *deltar2) * (*(Tabla_VN + k_r +1)-*(Tabla_VN + k_r)) + *(Tabla_VN + k_r), r2, k_r);
 				}
-			if(sij2 < s_cut2)
-				{
-				k_s = (int) ((sij2 - *deltas2) / *deltas2);
-				if(k_s < 0)
-					{k_s = 0;}
-				VP_new += ((sij2 - k_s * *deltas2)/ *deltas2) * (*(Tabla_VP + k_s +1)-*(Tabla_VP + k_s)) + *(Tabla_VP + k_s);
-				}
-			}
+				if(*(particle + i) == *(particle + j))
+					{
+						if(*(spin + i) == *(spin + j))
+							{
+							if(sij2 < s_cut2)
+								{
+								k_s = (int) ((sij2 - *deltas2) / *deltas2);
+								if(k_s < 0)
+									{k_s = 0;}
+								VP_new += ((sij2 - k_s * *deltas2)/ *deltas2) * (*(Tabla_VP + k_s +1)-*(Tabla_VP + k_s)) + *(Tabla_VP + k_s);
+								}
+							}
+						}
 		}
 		for(j = 0; j < target; j++)
 		{
-			{r2 = 0, p2 = 0;
+			r2 = 0, p2 = 0;
 			delta_ij(x, rij2, i, j);
 			delta_ij(p, pij2, i, j);
 			PBC_delta(rij2, L);
@@ -161,7 +173,6 @@ double delta_E_r(double *Tabla_VP, double *Tabla_VN, double r_cut2, double s_cut
 				{
 				r2 += *(rij2 + k) * (*(rij2 + k));
 				p2 += *(pij2 + k) * (*(pij2 + k));
-
 				}
 			sij2 = r2 / (q0 * q0) + p2 / (p0 * p0);
 						if(r2 < r_cut2)
@@ -172,18 +183,23 @@ double delta_E_r(double *Tabla_VP, double *Tabla_VN, double r_cut2, double s_cut
 					VN_old += ((r2 - k_r * *deltar2)/ *deltar2) * (*(Tabla_VN + k_r +1)-*(Tabla_VN + k_r)) + *(Tabla_VN + k_r);
 				//printf("%lf %lf %d \n", ((r2 - k_r * *deltar2)/ *deltar2) * (*(Tabla_VN + k_r +1)-*(Tabla_VN + k_r)) + *(Tabla_VN + k_r), r2, k_r);
 				}
-			if(sij2 < s_cut2)
-				{
-				k_s = (int) ((sij2 - *deltas2) / *deltas2);
-				if(k_s < 0)
-					{k_s = 0;}
-				VP_old += ((sij2 - k_s * *deltas2)/ *deltas2) * (*(Tabla_VP + k_s +1)-*(Tabla_VP + k_s)) + *(Tabla_VP + k_s);
-				}
-			}
+				if(*(particle + i) == *(particle + j))
+					{
+						if(*(spin + i) == *(spin + j))
+							{
+							if(sij2 < s_cut2)
+								{
+								k_s = (int) ((sij2 - *deltas2) / *deltas2);
+								if(k_s < 0)
+									{k_s = 0;}
+								VP_old += ((sij2 - k_s * *deltas2)/ *deltas2) * (*(Tabla_VP + k_s +1)-*(Tabla_VP + k_s)) + *(Tabla_VP + k_s);
+								}
+							}
+						}
 		}
 		for(j = target + 1; j < N; j++)
 		{
-			{r2 = 0, p2 = 0;
+			r2 = 0, p2 = 0;
 			delta_ij(x, rij2, i, j);
 			delta_ij(p, pij2, i, j);
 			PBC_delta(rij2, L);
@@ -202,19 +218,24 @@ double delta_E_r(double *Tabla_VP, double *Tabla_VN, double r_cut2, double s_cut
 					VN_old += ((r2 - k_r * *deltar2)/ *deltar2) * (*(Tabla_VN + k_r +1)-*(Tabla_VN + k_r)) + *(Tabla_VN + k_r);
 				//printf("%lf %lf %d \n", ((r2 - k_r * *deltar2)/ *deltar2) * (*(Tabla_VN + k_r +1)-*(Tabla_VN + k_r)) + *(Tabla_VN + k_r), r2, k_r);
 				}
-			if(sij2 < s_cut2)
-				{
-				k_s = (int) ((sij2 - *deltas2) / *deltas2);
-				if(k_s < 0)
-					{k_s = 0;}
-				VP_old += ((sij2 - k_s * *deltas2)/ *deltas2) * (*(Tabla_VP + k_s +1)-*(Tabla_VP + k_s)) + *(Tabla_VP + k_s);
-				}
+				if(*(particle + i) == *(particle + j))
+					{
+						if(*(spin + i) == *(spin + j))
+							{
+							if(sij2 < s_cut2)
+								{
+								k_s = (int) ((sij2 - *deltas2) / *deltas2);
+								if(k_s < 0)
+									{k_s = 0;}
+								VP_old += ((sij2 - k_s * *deltas2)/ *deltas2) * (*(Tabla_VP + k_s +1)-*(Tabla_VP + k_s)) + *(Tabla_VP + k_s);
+								}
+							}
+						}
 			}
-		}
 dE = VN_new - VN_old + VP_new - VP_old;
 return dE;
 }
-double delta_E_p(double *Tabla_VP, double s_cut2, double *deltas2, double *x, double *p, int N, double *rij2, double *pij2, double L, int target, double *p_new)
+double delta_E_p(double *Tabla_VP, double s_cut2, double *deltas2, double *x, double *p, int N, double *rij2, double *pij2, double L, int target, double *p_new, int *spin, int *particle)
 {
 double dE;
 int i = target, j, k_s, k;
