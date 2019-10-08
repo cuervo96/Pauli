@@ -10,11 +10,14 @@
 
 #define PI 3.14159
 
-int main()
+int main(int argc,char *argv[])
 {
 //----------DEFINICION VARIABLES--------------
-int n = 2*4, N = n * n * n, pasos = 10000000, size_tabla = 500000, i;
-double *x, *p, r_cut2 = 5.4 * 5.4, s_cut2 = 10, rho = 0.1, L = cbrt((double)N / rho), Temp = 4.0, beta = 1.0 / Temp;
+int n = 2*4, N = n * n * n, pasos = 50000,pretermalizacion = 2000000, Termalizacion = 20000, pasos_T = 100, size_tabla = 500000, i, j;
+double Temp = 4.0, T_inicial = 4.0, T_final = 0.05, dT = (double)(T_inicial - T_final) / (double) pasos_T;
+double *x, *p, r_cut2 = 5.4 * 5.4, s_cut2 = 10, rho,  beta = 1.0 / Temp;
+sscanf(argv[1],"%lf", &rho);
+double L = cbrt((double)N / rho);
 x = (double*) malloc (3 * N * sizeof(double));
 p = (double*) malloc (3 * N * sizeof(double));
 int *spin, *particle; // ¡¡¡¡spin up = 1, spin down = -1 ---- proton = 1, neutron = -1!!!!
@@ -31,9 +34,9 @@ deltas2 = (double*) malloc(size_tabla * sizeof(double));
 int *aceptacion_r = 0, *aceptacion_p = 0;
 aceptacion_r = (int*) malloc(sizeof(int));
 aceptacion_p = (int*) malloc(sizeof(int));
-double *E = (double*) malloc(pasos / 100 * sizeof(double));
+double *E = (double*) malloc(pasos_T * sizeof(double));
 char filename[255];
-sprintf(filename, "test_metropolis.txt");
+sprintf(filename, "EvsT_rho=%.2lf.txt", rho);
 FILE *fp=fopen(filename, "w");
 //---------------------------------------------
 //--------CONDICIONES INICIALES----------------
@@ -48,23 +51,39 @@ printf("%lf \n", Energia/ (double)N );
 printf("%lf \n",L);
 //---------------------------------------------
 //------------------METROPOLIS-----------------
-
-for(i = 1; i < pasos; i++)
+for(i = 0; i < pretermalizacion; i++)
 	{
-	Energia = metropolis_r(Energia, Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L, beta, aceptacion_r, spin, particle);
-	Energia = metropolis_p(Energia, Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L, beta, aceptacion_p, spin, particle);
-	if(i % 100)
+		Energia = metropolis_r(Energia, Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L, beta, aceptacion_r, spin, particle);
+		Energia = metropolis_p(Energia, Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L, beta, aceptacion_p, spin, particle);
+		printf("Progreso: %.2lf %% \r", (double)i / (double)(pretermalizacion + pasos_T * (Termalizacion + pasos) ) * 100);
+	}
+for(j = 0; j < pasos_T; j++)
+	{ *aceptacion_r = 0;
+		*aceptacion_p = 0;
+		for(i = 0; i < Termalizacion; i++)
+			{
+				Energia = metropolis_r(Energia, Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L, beta, aceptacion_r, spin, particle);
+				Energia = metropolis_p(Energia, Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L, beta, aceptacion_p, spin, particle);
+				printf("Progreso: %.2lf %% \r", (double) (i + j * (Termalizacion + pasos) + pretermalizacion) / (double)(pretermalizacion + pasos_T * (Termalizacion + pasos) ) * 100);
+			}
+	for(i = 0; i < pasos; i++)
 		{
-			*(E + i/100) = Energia;
+			Energia = metropolis_r(Energia, Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L, beta, aceptacion_r, spin, particle);
+			Energia = metropolis_p(Energia, Tabla_VP, Tabla_VN, r_cut2, s_cut2, deltar2, deltas2, x, p, N, rij2, pij2, L, beta, aceptacion_p, spin, particle);
+			if(i % 500 == 0)
+			*(E + j) += Energia * 500.0/ (double) pasos;
+			printf("Progreso: %.2lf %% \r", (double) (i + (j + 1) * Termalizacion + j * pasos + pretermalizacion) / (double)(pretermalizacion + pasos_T * (Termalizacion + pasos) ) * 100);
 		}
-	printf("Progreso: %.2lf %% \r", (double)i / (double)pasos * 100);
+		//printf("aceptacion_r = %lf \n", (double)*aceptacion_r / (double) (pasos + Termalizacion));
+		//printf("aceptacion_p = %lf \n", (double)*aceptacion_p / (double) (pasos + Termalizacion));
+		Temp -= dT;
+		beta = 1.0 / Temp;
 	}
-printf("aceptacion_r = %lf \n", (double)*aceptacion_r / (double)pasos);
-printf("aceptacion_p = %lf \n", (double)*aceptacion_p / (double)pasos);
-for(i = 0; i < pasos/100; i++)
-	{
-	fprintf(fp, "%lf \n", *(E + i)/ (double) N);
-	}
+	for(j = 0; j < pasos_T; j++)
+		{
+			fprintf(fp,"%d %lf \n", j, *(E + j));
+		}
+
 //----------------------------------------------
 fclose(fp);
 free(x);
