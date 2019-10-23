@@ -4,7 +4,7 @@ int i;
 *deltar2 = (double)r_cut2 / (double) (size_tabla + 1);
 *deltas2 = (double)s_cut2 / (double) (size_tabla + 1);
 double rij2 = *deltar2, sij2 = *deltas2;
-double D = 0.0059, VP0 = 34.32, VN0= 18.263, p1 = 6.2, p2 = 3.0, r1 = 1.7456, r2 = 1.7324, alpha = 1.2, d = 3.350;
+double D = 0.149493, VP0 = 34.32, VN0= 18.263, p1 = 6.2, p2 = 3.0, r1 = 1.7456, r2 = 1.7324, alpha = 1.2, d = 3.350;
 for(i = 0; i < size_tabla; i++)
 	{
 	*(Tabla_VP + i) = VP0 * D * (exp(-0.5 * sij2) - exp( -0.5 * s_cut2));

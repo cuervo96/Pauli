@@ -10,7 +10,11 @@ for(i = 0; i < 3 *N; i++ )
 	{
 	*(x_new + i) = *(x + i);
 	}
-double delta_r = 0.2, dE;
+double delta_r, dE;
+//	if(1.0/beta < 1.0)
+	//	 delta_r = (1.0 / (beta * 0.5)) * 6 * L / 1000.0;
+	//else
+		 delta_r = 0.25 / 4 * sqrt(1.0 / beta);
 for (i = 0; i < 3; i++)
 	{
 	*(x_new + 3*target + i) = *(x_new + 3*target + i) + (Random() - 0.5) * 2 * delta_r;
@@ -50,7 +54,7 @@ for(i = 0; i < 3 *N; i++ )
 	{
 	*(p_new + i) = *(p + i);
 	}
-double delta_p = 1.2, dE;
+double delta_p = sqrt(1.0 / beta), dE;
 for (i = 0; i < 3; i++)
 	{
 	*(p_new + 3 * target + i) = *(p_new + 3 * target + i) + (Random() - 0.5) * 2 * delta_p;

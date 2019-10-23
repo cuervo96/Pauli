@@ -13,7 +13,7 @@
 int main(int argc,char *argv[])
 {
 //----------DEFINICION VARIABLES--------------
-int n = 2*4, N = n * n * n, pasos = 50000,pretermalizacion = 2000000, Termalizacion = 20000, pasos_T = 100, size_tabla = 500000, i, j;
+int n = 8, N = n * n * n, pasos = 5000000,pretermalizacion = 20000000, Termalizacion = 1000000, pasos_T = 100, size_tabla = 500000, i, j;
 double Temp = 4.0, T_inicial = 4.0, T_final = 0.05, dT = (double)(T_inicial - T_final) / (double) pasos_T;
 double *x, *p, r_cut2 = 5.4 * 5.4, s_cut2 = 10, rho,  beta = 1.0 / Temp;
 sscanf(argv[1],"%lf", &rho);
@@ -74,8 +74,8 @@ for(j = 0; j < pasos_T; j++)
 			*(E + j) += Energia * 500.0/ (double) pasos;
 			printf("Progreso: %.2lf %% \r", (double) (i + (j + 1) * Termalizacion + j * pasos + pretermalizacion) / (double)(pretermalizacion + pasos_T * (Termalizacion + pasos) ) * 100);
 		}
-		//printf("aceptacion_r = %lf \n", (double)*aceptacion_r / (double) (pasos + Termalizacion));
-		//printf("aceptacion_p = %lf \n", (double)*aceptacion_p / (double) (pasos + Termalizacion));
+		printf("aceptacion_r = %lf \n", (double)*aceptacion_r / (double) (pasos + Termalizacion));
+		printf("aceptacion_p = %lf \n", (double)*aceptacion_p / (double) (pasos + Termalizacion));
 		Temp -= dT;
 		beta = 1.0 / Temp;
 	}
